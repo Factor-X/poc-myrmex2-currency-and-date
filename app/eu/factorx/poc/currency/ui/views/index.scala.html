@@ -1,0 +1,108 @@
+@(periodYearList: List[eu.factorx.poc.currency.deployement.dto.PeriodDTO],currencyList: List[eu.factorx.poc.currency.common.constants.Currency],currentPeriod:eu.factorx.poc.currency.deployement.dto.PeriodDTO)
+@import eu.factorx.poc.currency.deployement.dto.PeriodMonthDTO
+@import eu.factorx.poc.currency.deployement.dto.PeriodQuarterDTO
+@import eu.factorx.poc.currency.deployement.dto.PeriodYearDTO
+
+@import com.fasterxml.jackson.databind.ObjectMapper
+
+
+<!DOCTYPE html>
+
+    <html>
+        <head>
+            <title>Je suis un titre</title>
+
+            <script src="@routes.Assets.at("components/jquery/dist/jquery.min.js")" type="text/javascript"></script>
+            <script src="@routes.Assets.at("components/angular/angular.min.js")" type="text/javascript"></script>
+
+            <script src="@routes.Assets.at("javascripts/MainCtrl.js")" type="text/javascript"></script>
+
+        </head>
+<body ng-app="app" ng-controller="MainCtrl">
+
+
+    <script>
+    var currencyList = @Html(new ObjectMapper().writeValueAsString(currencyList));
+    var periodYearList = @Html(new ObjectMapper().writeValueAsString(periodYearList));
+    </script>
+
+    <!-- form -->
+    <select
+    ng-model="period"
+    ng-options="period.id as period.code for period in periodYearList">
+    </select>
+
+    <button ng-click="refreshValues()">Refresh values for this period !!</button>
+
+
+    <select
+    ng-model="currency"
+    ng-options="currency as currency for currency in currencyList">
+    </select>
+
+    <button ng-click="send()">Click !</button>
+
+    Result : {{result}}
+
+    <h3>Periods</h3>
+
+
+    <table>
+        <tr>
+            <td></td>
+            @if(currentPeriod.isInstanceOf[PeriodQuarterDTO]){
+                <td>
+                    <a href="@(currentPeriod.asInstanceOf[PeriodQuarterDTO].getPeriodYear.getId)">
+                        To Year @(currentPeriod.asInstanceOf[PeriodQuarterDTO].getPeriodYear.getCode)
+                    </a>
+                </td>
+            }
+            @if(currentPeriod.isInstanceOf[PeriodMonthDTO]){
+                <td>
+                    <a href="@(currentPeriod.asInstanceOf[PeriodMonthDTO].getQuarterId)">
+                        To quarter
+                    </a>
+                </td>
+            }
+            <td></td>
+        </tr>
+        <tr>
+            <td><a href="/@currentPeriod.getPreviousPeriodId">To previous period</a></td>
+            <td>
+                @if(currentPeriod.isInstanceOf[PeriodYearDTO]){
+                    Year @currentPeriod.getCode
+                }
+                @if(currentPeriod.isInstanceOf[PeriodQuarterDTO]){
+
+                    Quarter  @(currentPeriod.asInstanceOf[PeriodQuarterDTO].getPeriodYear.getCode) / @currentPeriod.getCode
+                }
+                @if(currentPeriod.isInstanceOf[PeriodMonthDTO]){
+                    month  @(currentPeriod.asInstanceOf[PeriodMonthDTO].getPeriodYear.getCode) / @currentPeriod.getCode
+                }
+            </td>
+            <td><a href="/@currentPeriod.getNextPeriodId">To next period</a></td>
+        </tr>
+        <tr>
+            <td></td>
+            @if(currentPeriod.isInstanceOf[PeriodYearDTO]){
+                <td>
+                    <a href="@(currentPeriod.asInstanceOf[PeriodYearDTO].getQuarterIds.get(0))">
+                        To quarter
+                    </a>
+                    <a href="@(currentPeriod.asInstanceOf[PeriodYearDTO].getMonthIds.get(0))">
+                        To month
+                    </a>
+                </td>
+            }
+            @if(currentPeriod.isInstanceOf[PeriodQuarterDTO]){
+                <td>
+                    <a href="@(currentPeriod.asInstanceOf[PeriodQuarterDTO].getMonthIds.get(0))">
+                        To month
+                    </a>
+                </td>
+            }
+            <td></td>
+        </tr>
+    </table>
+
+</body>
